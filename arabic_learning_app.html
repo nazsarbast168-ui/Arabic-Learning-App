@@ -1,754 +1,575 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arabic Learning App - Naz Sarbast</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                        arabic: ['Tajawal', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arabic Learning App - Naz Sarbast</title>
 
-    <style>
-        :root {
-            --bg-custom: #f8fafc;
-            --btn-custom: #3b82f6;
-            --btn-text-custom: #ffffff;
-        }
+  <style>
+    /* CSS Variables for theme management */
+    :root {
+      --bg-color: #f4f7f6;
+      --card-bg: #ffffff;
+      --text-color: #2c3e50;
+      --btn-color: #27ae60;
+      --btn-text: #ffffff;
+      --border-color: #e0e0e0;
+      --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      --app-font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Traditional Arabic', 'Cairo', sans-serif;
+    }
 
-        body {
-            background-color: var(--bg-custom);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
+    /* Dark Mode Theme Variables */
+    body.dark-mode {
+      --bg-color: #1a1a2e;
+      --card-bg: #16213e;
+      --text-color: #f1f1f1;
+      --border-color: #0f3460;
+      --shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
 
-        .custom-btn {
-            background-color: var(--btn-custom) !important;
-            color: var(--btn-text-custom) !important;
-            transition: all 0.2s ease;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
 
-        .custom-btn:hover {
-            filter: brightness(0.9);
-            transform: translateY(-2px);
-        }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: var(--app-font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
 
-        .custom-btn:active {
-            transform: translateY(0);
-        }
+    /* SVG Icon Styling */
+    .icon {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
 
-        .custom-border {
-            border-color: var(--btn-custom) !important;
-        }
+    /* Dynamic Button Styling */
+    .custom-btn {
+      background-color: var(--btn-color);
+      color: var(--btn-text);
+      border: none;
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
 
-        .custom-text-color {
-            color: var(--btn-custom) !important;
-        }
+    .custom-btn:hover {
+      transform: translateY(-2px);
+      opacity: 0.9;
+    }
 
-        .custom-bg-light {
-            background-color: var(--btn-custom);
-            opacity: 0.15;
-        }
+    .custom-btn:active {
+      transform: translateY(0);
+    }
 
-        /* Glassmorphism styling */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+    /* Navbar Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      position: relative;
+      z-index: 100;
+    }
 
-        .dark .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+    /* Top Left: Dark/Light Mode Toggle */
+    .theme-btn, .settings-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
 
-        /* Hide scrollbars for clean UI */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+    /* Top Right: Settings Button & Dropdown */
+    .settings-container {
+      position: relative;
+    }
 
-        /* Keypress animation */
-        @keyframes keyPop {
-            0% { transform: scale(1); }
-            50% { transform: scale(0.92); }
-            100% { transform: scale(1); }
-        }
-        .key-active {
-            animation: keyPop 0.15s ease-in-out;
-        }
-    </style>
+    .settings-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 55px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      width: 250px;
+      z-index: 200;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .settings-menu.active {
+      display: flex;
+    }
+
+    .setting-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .setting-item label {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .setting-item input[type="color"],
+    .setting-item select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-color);
+      color: var(--text-color);
+      cursor: pointer;
+    }
+
+    /* Landing Screen */
+    .landing-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-grow: 1;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .landing-screen h1 {
+      font-size: 2.2rem;
+      margin-bottom: 25px;
+    }
+
+    /* Main Dashboard Screen */
+    .dashboard-screen {
+      display: none;
+      flex-direction: column;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      flex-grow: 1;
+    }
+
+    .dashboard-screen.active {
+      display: flex;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      margin: 20px 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+
+    /* Grid Layouts */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .word-grid {
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    }
+
+    .card-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, border-color 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-item:hover {
+      transform: translateY(-4px);
+      border-color: var(--btn-color);
+    }
+
+    .card-item .arabic-text {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .card-item .sub-text {
+      font-size: 0.8rem;
+      margin-top: 4px;
+      opacity: 0.8;
+    }
+
+    /* Typing Section */
+    .typing-section {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .typing-input-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .typing-input {
+      flex: 1;
+      padding: 12px;
+      font-size: 1.3rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-color);
+      color: var(--text-color);
+      direction: rtl;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      border-top: 1px solid var(--border-color);
+      margin-top: auto;
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans text-slate-800 dark:text-slate-100 dark:bg-slate-900 transition-colors duration-300">
+<body>
 
-    <!-- Navigation / Header Controls -->
-    <header class="w-full p-4 md:p-6 flex justify-between items-center z-50 relative max-w-7xl mx-auto">
-        <!-- Top Left: Dark/Light Mode Toggle -->
-        <div class="flex items-center space-x-2">
-            <button id="themeToggleBtn" onclick="toggleDarkMode()" class="p-3 rounded-full bg-white dark:bg-slate-800 shadow-md hover:shadow-lg transition-all text-slate-700 dark:text-amber-400 flex items-center justify-center w-12 h-12 focus:outline-none" title="Toggle Light/Dark Mode">
-                <i id="themeIcon" class="fas fa-moon text-xl"></i>
-            </button>
-            <span class="text-xs font-semibold uppercase tracking-wider hidden sm:inline-block text-slate-500 dark:text-slate-400" id="themeLabel">Dark Mode</span>
+  <!-- Header Navigation -->
+  <header>
+    <!-- Top Left: Theme Toggle -->
+    <button class="theme-btn" id="themeBtn" title="Toggle Theme">
+      <svg class="icon" viewBox="0 0 24 24" id="themeIcon">
+        <!-- Moon Icon -->
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+
+    <!-- Top Right: Settings -->
+    <div class="settings-container">
+      <button class="settings-btn" id="settingsBtn" title="Settings">
+        <svg class="icon" viewBox="0 0 24 24">
+          <!-- Gear Icon -->
+          <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"></path>
+        </svg>
+      </button>
+      
+      <div class="settings-menu" id="settingsMenu">
+        <div class="setting-item">
+          <label for="bgColorPicker" id="lblBgColor">Background Color</label>
+          <input type="color" id="bgColorPicker" value="#f4f7f6">
         </div>
-
-        <!-- App Logo/Header Text (Visible in interactive mode) -->
-        <div id="headerTitle" class="hidden text-xl md:text-2xl font-bold font-arabic custom-text-color tracking-wide flex items-center gap-2">
-            <i class="fa-solid fa-book-open"></i>
-            <span id="appMainTitle">Learn Arabic</span>
+        <div class="setting-item">
+          <label for="btnColorPicker" id="lblBtnColor">Button Color</label>
+          <input type="color" id="btnColorPicker" value="#27ae60">
         </div>
-
-        <!-- Top Right: Settings Button & Panel Container -->
-        <div class="relative">
-            <button onclick="toggleSettingsMenu()" class="p-3 rounded-full bg-white dark:bg-slate-800 shadow-md hover:shadow-lg transition-all text-slate-700 dark:text-slate-200 flex items-center justify-center w-12 h-12 focus:outline-none" title="Settings">
-                <i class="fas fa-cog text-xl spin-hover"></i>
-            </button>
-
-            <!-- Dropdown Settings Panel -->
-            <div id="settingsPanel" class="hidden absolute right-0 mt-3 w-72 md:w-80 glass-card bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-5 border border-slate-100 dark:border-slate-700 z-50 text-slate-800 dark:text-slate-100">
-                <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-200 dark:border-slate-700">
-                    <h3 class="font-bold text-lg flex items-center gap-2" id="settingsHeading">
-                        <i class="fas fa-sliders-h custom-text-color"></i> Settings
-                    </h3>
-                    <button onclick="toggleSettingsMenu()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <!-- Settings Controls -->
-                <div class="space-y-4">
-                    <!-- Background Color Picker -->
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-500 dark:text-slate-400" id="lblBgColor">Background Color</label>
-                        <div class="flex items-center gap-2">
-                            <input type="color" id="bgColorInput" value="#f8fafc" onchange="changeBgColor(this.value)" class="w-10 h-10 rounded-lg cursor-pointer border-0 bg-transparent">
-                            <span class="text-sm font-mono text-slate-600 dark:text-slate-300" id="bgColorHex">#f8fafc</span>
-                            <button onclick="resetBgColor()" class="ml-auto text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 underline">Reset</button>
-                        </div>
-                    </div>
-
-                    <!-- Button Color Picker -->
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-500 dark:text-slate-400" id="lblBtnColor">Button Color</label>
-                        <div class="flex items-center gap-2">
-                            <input type="color" id="btnColorInput" value="#3b82f6" onchange="changeBtnColor(this.value)" class="w-10 h-10 rounded-lg cursor-pointer border-0 bg-transparent">
-                            <span class="text-sm font-mono text-slate-600 dark:text-slate-300" id="btnColorHex">#3b82f6</span>
-                            <button onclick="resetBtnColor()" class="ml-auto text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 underline">Reset</button>
-                        </div>
-                    </div>
-
-                    <!-- Language Selector -->
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-500 dark:text-slate-400" id="lblLanguage">UI Language</label>
-                        <select id="langSelect" onchange="changeLanguage(this.value)" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="en">English</option>
-                            <option value="ku">Kurdish (Kurdî)</option>
-                            <option value="ar">Arabic (العربية)</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+        <div class="setting-item">
+          <label for="langSelect" id="lblLang">Language</label>
+          <select id="langSelect">
+            <option value="en">English</option>
+            <option value="ku">Kurdî (Kurdish)</option>
+            <option value="ar">العربية (Arabic)</option>
+          </select>
         </div>
-    </header>
+      </div>
+    </div>
+  </header>
 
-    <!-- Main Content Wrapper -->
-    <main class="flex-grow flex flex-col justify-center items-center px-4 max-w-7xl mx-auto w-full relative">
-        
-        <!-- SECTION 1: LANDING SCREEN -->
-        <section id="landingView" class="flex flex-col items-center justify-center text-center my-auto py-12 transition-all duration-500">
-            <!-- Decorative Badge -->
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 font-semibold text-sm mb-6 border border-blue-100 dark:border-slate-700 shadow-sm">
-                <i class="fas fa-sparkles"></i>
-                <span id="welcomeBadge">Interactive Arabic Learning</span>
-            </div>
+  <!-- Landing Screen -->
+  <main class="landing-screen" id="landingScreen">
+    <h1 id="welcomeText">please you can start</h1>
+    <button class="custom-btn" id="startBtn">
+      <span id="startBtnText">Start</span>
+      <svg class="icon" viewBox="0 0 24 24" style="fill:none; stroke:currentColor; stroke-width:2;">
+        <path d="M5 12h14M12 5l7 7-7 7"></path>
+      </svg>
+    </button>
+  </main>
 
-            <!-- Central Welcome Text -->
-            <h1 id="landingMsg" class="text-3xl md:text-5xl lg:text-6xl font-extrabold text-slate-800 dark:text-white mb-8 tracking-tight max-w-2xl leading-tight">
-                Please you can start
-            </h1>
+  <!-- Main Application Content Screen -->
+  <div class="dashboard-screen" id="dashboardScreen">
+    <section>
+      <h2 class="section-title">
+        <span id="titleLetters">Arabic Letters</span>
+      </h2>
+      <div class="grid-container" id="lettersContainer"></div>
+    </section>
 
-            <!-- Curved Curved Curved Curved Start Button -->
-            <button id="startBtn" onclick="showAppContent()" class="custom-btn text-xl md:text-2xl font-bold py-5 px-12 rounded-full shadow-xl hover:shadow-2xl transform transition-all duration-300 flex items-center gap-4 group">
-                <span id="startBtnText">Start</span>
-                <i class="fas fa-arrow-right text-lg group-hover:translate-x-2 transition-transform"></i>
-            </button>
-        </section>
+    <section class="typing-section">
+      <h2 class="section-title">
+        <span id="titleTyping">Type Letters Practice</span>
+      </h2>
+      <p id="descTyping" style="opacity: 0.8; font-size: 0.9rem; margin-top: 5px;">Type any Arabic text below and click play to hear it:</p>
+      <div class="typing-input-container">
+        <input type="text" class="typing-input" id="typingInput" placeholder="اكتب هنا..." dir="rtl">
+        <button class="custom-btn" id="speakTypeBtn">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path>
+          </svg>
+        </button>
+      </div>
+    </section>
 
-        <!-- SECTION 2: INTERACTIVE LEARNING APP VIEW (Hidden initially) -->
-        <section id="appView" class="hidden w-full flex-col items-center my-4 space-y-6 animate-fade-in">
-            
-            <!-- Navigation Tabs for App Sections -->
-            <div class="flex flex-wrap justify-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 backdrop-blur-md rounded-2xl w-full max-w-2xl shadow-inner">
-                <button onclick="switchTab('letters')" id="tabLetters" class="tab-btn flex-1 min-w-[100px] py-3 px-4 rounded-xl font-bold text-sm md:text-base transition-all duration-200 flex items-center justify-center gap-2 custom-btn shadow-md">
-                    <i class="fas fa-font"></i>
-                    <span id="tabLettersText">Letters</span>
-                </button>
-                <button onclick="switchTab('type')" id="tabType" class="tab-btn flex-1 min-w-[100px] py-3 px-4 rounded-xl font-bold text-sm md:text-base text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-200 flex items-center justify-center gap-2">
-                    <i class="fas fa-keyboard"></i>
-                    <span id="tabTypeText">Type Letters</span>
-                </button>
-                <button onclick="switchTab('words')" id="tabWords" class="tab-btn flex-1 min-w-[100px] py-3 px-4 rounded-xl font-bold text-sm md:text-base text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-200 flex items-center justify-center gap-2">
-                    <i class="fas fa-book font-arabic"></i>
-                    <span id="tabWordsText">Words</span>
-                </button>
-            </div>
+    <section>
+      <h2 class="section-title">
+        <span id="titleWords">Vocabulary Library</span>
+      </h2>
+      <div class="grid-container word-grid" id="wordsContainer"></div>
+    </section>
+  </div>
 
-            <!-- SUB-SECTION A: ARABIC LETTERS GRID -->
-            <div id="sectionLetters" class="w-full max-w-5xl space-y-4">
-                <div class="text-center mb-6">
-                    <h2 class="text-2xl font-bold font-arabic mb-1" id="lettersSubTitle">الحروف العربية</h2>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm" id="lettersDesc">Tap any letter to hear its pronunciation</p>
-                </div>
+  <!-- Footer -->
+  <footer>
+    <span id="footerText">Naz Sarbast</span>
+  </footer>
 
-                <!-- Alphabet Grid (Right to Left for Arabic) -->
-                <div id="alphabetGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-3 md:gap-4 dir-rtl" dir="rtl">
-                    <!-- Populated dynamically via Javascript -->
-                </div>
-            </div>
+  <script>
+    const arabicAlphabet = [
+      { char: 'أ', name: 'Alif' }, { char: 'ب', name: 'Baa' }, { char: 'ت', name: 'Taa' },
+      { char: 'ث', name: 'Thaa' }, { char: 'ج', name: 'Jeem' }, { char: 'ح', name: 'Haa' },
+      { char: 'خ', name: 'Khaa' }, { char: 'د', name: 'Dal' }, { char: 'ذ', name: 'Dhal' },
+      { char: 'ر', name: 'Raa' }, { char: 'ز', name: 'Zaay' }, { char: 'س', name: 'Seen' },
+      { char: 'ش', name: 'Sheen' }, { char: 'ص', name: 'Saad' }, { char: 'ض', name: 'Daad' },
+      { char: 'ط', name: 'Taa' }, { char: 'ظ', name: 'Dhaa' }, { char: 'ع', name: 'Ayn' },
+      { char: 'غ', name: 'Ghayn' }, { char: 'ف', name: 'Faa' }, { char: 'ق', name: 'Qaaf' },
+      { char: 'ك', name: 'Kaaf' }, { char: 'ل', name: 'Laam' }, { char: 'م', name: 'Meem' },
+      { char: 'ن', name: 'Noon' }, { char: 'هـ', name: 'Haa' }, { char: 'و', name: 'Waw' },
+      { char: 'ي', name: 'Yaa' }
+    ];
 
-            <!-- SUB-SECTION B: TYPE LETTERS SECTION -->
-            <div id="sectionType" class="hidden w-full max-w-3xl space-y-6">
-                <div class="text-center">
-                    <h2 class="text-2xl font-bold font-arabic mb-1" id="typeSubTitle">ممارسة الكتابة</h2>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm" id="typeDesc">Type on screen or keyboard to hear speech feedback</p>
-                </div>
+    const vocabularyList = [
+      { ar: 'مَرْحَبًا', en: 'Hello', ku: 'سڵاو' },
+      { ar: 'شُكْرًا', en: 'Thank you', ku: 'سوپاس' },
+      { ar: 'كِتَاب', en: 'Book', ku: 'پرتووک' },
+      { ar: 'قَلَم', en: 'Pen', ku: 'پێنووس' },
+      { ar: 'مَدْرَسَة', en: 'School', ku: 'قوتابخانە' },
+      { ar: 'بَيْت', en: 'House', ku: 'ماڵ' },
+      { ar: 'مَاء', en: 'Water', ku: 'ئاو' },
+      { ar: 'شَمْس', en: 'Sun', ku: 'خۆر' },
+      { ar: 'قَمَر', en: 'Moon', ku: 'مانگ' },
+      { ar: 'شَجَرَة', en: 'Tree', ku: 'دار' },
+      { ar: 'زَهْرَة', en: 'Flower', ku: 'گوڵ' },
+      { ar: 'سَيَّارَة', en: 'Car', ku: 'ئۆتۆمبێل' },
+      { ar: 'طَائِرَة', en: 'Airplane', ku: 'فڕۆکە' },
+      { ar: 'صَدِيق', en: 'Friend', ku: 'هاوڕێ' },
+      { ar: 'عَائِلَة', en: 'Family', ku: 'خێزان' },
+      { ar: 'طَعَام', en: 'Food', ku: 'خواردن' },
+      { ar: 'قَهْوَة', en: 'Coffee', ku: 'قاوە' },
+      { ar: 'شَاي', en: 'Tea', ku: 'چا' },
+      { ar: 'نَار', en: 'Fire', ku: 'ئاگر' },
+      { ar: 'أَرْض', en: 'Earth', ku: 'زەوی' },
+      { ar: 'سَمَاء', en: 'Sky', ku: 'ئاسمان' },
+      { ar: 'بَحْر', en: 'Sea', ku: 'دەریا' },
+      { ar: 'جَبَل', en: 'Mountain', ku: 'کێو' },
+      { ar: 'نَهْر', en: 'River', ku: 'ڕووبار' },
+      { ar: 'مَلِك', en: 'King', ku: 'پاشا' },
+      { ar: 'يَوْم', en: 'Day', ku: 'ڕۆژ' },
+      { ar: 'لَيْل', en: 'Night', ku: 'شەو' },
+      { ar: 'نُور', en: 'Light', ku: 'ڕووناکی' }
+    ];
 
-                <!-- Interactive Text Input & Controls -->
-                <div class="glass-card bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-xl border border-slate-200/50 dark:border-slate-700/50 space-y-4">
-                    <div class="relative">
-                        <textarea id="typingArea" dir="rtl" rows="3" placeholder="اكتب هنا..." class="w-full p-4 text-3xl font-arabic border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-900 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none shadow-inner"></textarea>
-                        
-                        <div class="absolute bottom-3 left-3 flex gap-2">
-                            <button onclick="speakText(document.getElementById('typingArea').value)" class="custom-btn p-2.5 rounded-xl text-white shadow hover:scale-105 transition-transform" title="Speak All">
-                                <i class="fas fa-volume-high text-lg"></i>
-                            </button>
-                            <button onclick="clearTypingArea()" class="bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 p-2.5 rounded-xl hover:bg-red-200 transition-colors" title="Clear">
-                                <i class="fas fa-trash-can text-lg"></i>
-                            </button>
-                        </div>
-                    </div>
+    const translations = {
+      en: {
+        welcome: "please you can start",
+        startBtn: "Start",
+        lblBgColor: "Background Color",
+        lblBtnColor: "Button Color",
+        lblLang: "Language",
+        titleLetters: "Arabic Letters",
+        titleTyping: "Type Letters Practice",
+        descTyping: "Type any Arabic text below and click play to hear it:",
+        titleWords: "Vocabulary Library",
+        footer: "Naz Sarbast"
+      },
+      ku: {
+        welcome: "تکایە دەتوانی دەستپێبکەیت",
+        startBtn: "دەستپێکردن",
+        lblBgColor: "ڕەنگی پاشبنەما",
+        lblBtnColor: "ڕەنگی دوگمە",
+        lblLang: "زمان",
+        titleLetters: "پیتە عەرەبییەکان",
+        titleTyping: "ڕاهێنانی نووسینی پیتەکان",
+        descTyping: "دەقێکی عەرەبی بنووسە بۆ بیستنی دەنگەکەی:",
+        titleWords: "فەرهەنگی وشەکان",
+        footer: "Naz Sarbast"
+      },
+      ar: {
+        welcome: "رجاءً يمكنك البدء",
+        startBtn: "ابدأ",
+        lblBgColor: "لون الخلفية",
+        lblBtnColor: "لون الأزرار",
+        lblLang: "اللغة",
+        titleLetters: "الحروف العربية",
+        titleTyping: "قسم كتابة الحروف",
+        descTyping: "اكتب أي نص عربي واضغط على الزر لسماعه:",
+        titleWords: "مكتبة الكلمات",
+        footer: "Naz Sarbast"
+      }
+    };
 
-                    <!-- Virtual Arabic On-Screen Keyboard -->
-                    <div class="bg-slate-100 dark:bg-slate-900/60 p-3 rounded-2xl border border-slate-200/60 dark:border-slate-800">
-                        <div id="virtualKeyboard" class="grid grid-cols-7 sm:grid-cols-10 gap-1.5 md:gap-2 dir-rtl" dir="rtl">
-                            <!-- Virtual keys generated dynamically -->
-                        </div>
-                        <!-- Keyboard Controls -->
-                        <div class="flex gap-2 mt-2">
-                            <button onclick="addSpace()" class="flex-grow py-2 bg-white dark:bg-slate-800 rounded-xl text-sm font-semibold shadow hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200" id="btnSpacebar">Space</button>
-                            <button onclick="backspace()" class="px-5 py-2 bg-slate-200 dark:bg-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200">
-                                <i class="fas fa-backspace"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    let currentLang = 'en';
 
-            <!-- SUB-SECTION C: LARGE ARABIC WORDS SECTION -->
-            <div id="sectionWords" class="hidden w-full max-w-6xl space-y-6">
-                <div class="text-center">
-                    <h2 class="text-2xl font-bold font-arabic mb-1" id="wordsSubTitle">مفردات الكلمات</h2>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm" id="wordsDesc">Explore words and tap cards to listen to audio</p>
-                </div>
+    const themeBtn = document.getElementById('themeBtn');
+    const themeIcon = document.getElementById('themeIcon');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsMenu = document.getElementById('settingsMenu');
+    const bgColorPicker = document.getElementById('bgColorPicker');
+    const btnColorPicker = document.getElementById('btnColorPicker');
+    const langSelect = document.getElementById('langSelect');
+    const landingScreen = document.getElementById('landingScreen');
+    const dashboardScreen = document.getElementById('dashboardScreen');
+    const startBtn = document.getElementById('startBtn');
+    const lettersContainer = document.getElementById('lettersContainer');
+    const wordsContainer = document.getElementById('wordsContainer');
+    const typingInput = document.getElementById('typingInput');
+    const speakTypeBtn = document.getElementById('speakTypeBtn');
 
-                <!-- Search & Category Filters -->
-                <div class="flex flex-col md:flex-row gap-3 items-center justify-between">
-                    <!-- Search Input -->
-                    <div class="relative w-full md:w-80">
-                        <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="wordSearch" oninput="filterWords()" placeholder="Search word or meaning..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
-                    </div>
+    function playAudio(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ar-SA';
+        utterance.rate = 0.8;
+        window.speechSynthesis.speak(utterance);
+      } else {
+        alert("Text-to-speech is not supported in your browser.");
+      }
+    }
 
-                    <!-- Category Pills -->
-                    <div id="categoryContainer" class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar">
-                        <!-- Category buttons dynamically generated -->
-                    </div>
-                </div>
+    function renderLetters() {
+      lettersContainer.innerHTML = '';
+      arabicAlphabet.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card-item';
+        card.innerHTML = `
+          <div class="arabic-text">${item.char}</div>
+          <div class="sub-text">${item.name}</div>
+        `;
+        card.addEventListener('click', () => playAudio(item.char));
+        lettersContainer.appendChild(card);
+      });
+    }
 
-                <!-- Word Cards Grid -->
-                <div id="wordsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    <!-- Words inserted dynamically -->
-                </div>
-            </div>
+    function renderWords() {
+      wordsContainer.innerHTML = '';
+      vocabularyList.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card-item';
+        const sub = currentLang === 'ku' ? item.ku : item.en;
+        card.innerHTML = `
+          <div class="arabic-text">${item.ar}</div>
+          <div class="sub-text">${sub}</div>
+        `;
+        card.addEventListener('click', () => playAudio(item.ar));
+        wordsContainer.appendChild(card);
+      });
+    }
 
-        </section>
-    </main>
+    function updateLanguage(lang) {
+      currentLang = lang;
+      const t = translations[lang];
 
-    <!-- SECTION 3: FOOTER SECTION -->
-    <footer class="w-full py-6 text-center text-slate-500 dark:text-slate-400 font-medium text-sm mt-auto border-t border-slate-200/50 dark:border-slate-800/50">
-        <div class="max-w-7xl mx-auto px-4 flex justify-center items-center gap-2">
-            <span id="footerText">Created by</span>
-            <span class="font-bold custom-text-color px-2 py-0.5 rounded-md bg-blue-50 dark:bg-slate-800">Naz Sarbast</span>
-        </div>
-    </footer>
+      document.getElementById('welcomeText').innerText = t.welcome;
+      document.getElementById('startBtnText').innerText = t.startBtn;
+      document.getElementById('lblBgColor').innerText = t.lblBgColor;
+      document.getElementById('lblBtnColor').innerText = t.lblBtnColor;
+      document.getElementById('lblLang').innerText = t.lblLang;
+      document.getElementById('titleLetters').innerText = t.titleLetters;
+      document.getElementById('titleTyping').innerText = t.titleTyping;
+      document.getElementById('descTyping').innerText = t.descTyping;
+      document.getElementById('titleWords').innerText = t.titleWords;
+      document.getElementById('footerText').innerText = t.footer;
 
-    <script>
-        /* ==================== DATA DEFINITIONS ==================== */
-        
-        // 1. Arabic Alphabet Data
-        const ARABIC_LETTERS = [
-            { char: 'أ', name: 'Alif', translit: 'A' },
-            { char: 'ب', name: 'Baa', translit: 'B' },
-            { char: 'ت', name: 'Taa', translit: 'T' },
-            { char: 'ث', name: 'Thaa', translit: 'Th' },
-            { char: 'ج', name: 'Jeem', translit: 'J' },
-            { char: 'ح', name: 'Haa', translit: 'H' },
-            { char: 'خ', name: 'Khaa', translit: 'Kh' },
-            { char: 'د', name: 'Dal', translit: 'D' },
-            { char: 'ذ', name: 'Thal', translit: 'Th' },
-            { char: 'ر', name: 'Raa', translit: 'R' },
-            { char: 'ز', name: 'Zay', translit: 'Z' },
-            { char: 'س', name: 'Seen', translit: 'S' },
-            { char: 'ش', name: 'Sheen', translit: 'Sh' },
-            { char: 'ص', name: 'Saad', translit: 'S' },
-            { char: 'ض', name: 'Daad', translit: 'D' },
-            { char: 'ط', name: 'Taa', translit: 'T' },
-            { char: 'ظ', name: 'Zhaa', translit: 'Zh' },
-            { char: 'ع', name: 'Ayn', translit: '3' },
-            { char: 'غ', name: 'Ghayn', translit: 'Gh' },
-            { char: 'ف', name: 'Faa', translit: 'F' },
-            { char: 'ق', name: 'Qaaf', translit: 'Q' },
-            { char: 'ك', name: 'Kaaf', translit: 'K' },
-            { char: 'ل', name: 'Laam', translit: 'L' },
-            { char: 'م', name: 'Meem', translit: 'M' },
-            { char: 'ن', name: 'Noon', translit: 'N' },
-            { char: 'هـ', name: 'Haa', translit: 'H' },
-            { char: 'و', name: 'Waw', translit: 'W' },
-            { char: 'ي', name: 'Yaa', translit: 'Y' }
-        ];
+      renderWords();
+    }
 
-        // 2. Large Arabic Words Collection
-        const ARABIC_WORDS = [
-            // Animals
-            { ar: 'أسد', en: 'Lion', ku: 'شێر', cat: 'Animals', icon: '🦁' },
-            { ar: 'قطة', en: 'Cat', ku: 'پشیلە', cat: 'Animals', icon: '🐱' },
-            { ar: 'كلب', en: 'Dog', ku: 'سەگ', cat: 'Animals', icon: '🐶' },
-            { ar: 'عصفور', en: 'Bird', ku: 'باڵندە', cat: 'Animals', icon: '🐦' },
-            { ar: 'حصان', en: 'Horse', ku: 'ئەسپ', cat: 'Animals', icon: '🐴' },
-            { ar: 'فيل', en: 'Elephant', ku: 'فیل', cat: 'Animals', icon: '🐘' },
-            { ar: 'أرنب', en: 'Rabbit', ku: 'کەروێشک', cat: 'Animals', icon: '🐰' },
-            { ar: 'سمكة', en: 'Fish', ku: 'ماسی', cat: 'Animals', icon: '🐟' },
-            { ar: 'دب', en: 'Bear', ku: 'ورچ', cat: 'Animals', icon: '🐻' },
-            { ar: 'جمل', en: 'Camel', ku: 'وشتر', cat: 'Animals', icon: '🐪' },
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      if (document.body.classList.contains('dark-mode')) {
+        // Sun Icon
+        themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2"></path>';
+      } else {
+        // Moon Icon
+        themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+      }
+    });
 
-            // Fruits & Food
-            { ar: 'تفاحة', en: 'Apple', ku: 'سێو', cat: 'Food', icon: '🍎' },
-            { ar: 'موز', en: 'Banana', ku: 'مۆز', cat: 'Food', icon: '🍌' },
-            { ar: 'برتقال', en: 'Orange', ku: 'پرتەقاڵ', cat: 'Food', icon: '🍊' },
-            { ar: 'عنب', en: 'Grapes', ku: 'ترێ', cat: 'Food', icon: '🍇' },
-            { ar: 'خبز', en: 'Bread', ku: 'نان', cat: 'Food', icon: '🍞' },
-            { ar: 'ماء', en: 'Water', ku: 'ئاو', cat: 'Food', icon: '💧' },
-            { ar: 'حليب', en: 'Milk', ku: 'شیر', cat: 'Food', icon: '🥛' },
-            { ar: 'جبن', en: 'Cheese', ku: 'پەنیر', cat: 'Food', icon: '🧀' },
-            { ar: 'تمر', en: 'Dates', ku: 'خورما', cat: 'Food', icon: '🌴' },
-            { ar: 'عسل', en: 'Honey', ku: 'هەنگوین', cat: 'Food', icon: '🍯' },
+    settingsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      settingsMenu.classList.toggle('active');
+    });
 
-            // Colors
-            { ar: 'أحمر', en: 'Red', ku: 'سور', cat: 'Colors', icon: '🔴' },
-            { ar: 'أزرق', en: 'Blue', ku: 'شین', cat: 'Colors', icon: '🔵' },
-            { ar: 'أخضر', en: 'Green', ku: 'سەوز', cat: 'Colors', icon: '🟢' },
-            { ar: 'أصفر', en: 'Yellow', ku: 'زەرد', cat: 'Colors', icon: '🟡' },
-            { ar: 'أسود', en: 'Black', ku: 'رەش', cat: 'Colors', icon: '⚫' },
-            { ar: 'أبيض', en: 'White', ku: 'سپی', cat: 'Colors', icon: '⚪' },
+    document.addEventListener('click', (e) => {
+      if (!settingsMenu.contains(e.target) && e.target !== settingsBtn) {
+        settingsMenu.classList.remove('active');
+      }
+    });
 
-            // Family
-            { ar: 'أب', en: 'Father', ku: 'باوک', cat: 'Family', icon: '👨' },
-            { ar: 'أم', en: 'Mother', ku: 'دایک', cat: 'Family', icon: '👩' },
-            { ar: 'أخ', en: 'Brother', ku: 'برا', cat: 'Family', icon: '👦' },
-            { ar: 'أخت', en: 'Sister', ku: 'خوشک', cat: 'Family', icon: '👧' },
-            { ar: 'جد', en: 'Grandfather', ku: 'باپیر', cat: 'Family', icon: '👴' },
-            { ar: 'جدة', en: 'Grandmother', ku: 'داپیر', cat: 'Family', icon: '👵' },
+    bgColorPicker.addEventListener('input', (e) => {
+      document.documentElement.style.setProperty('--bg-color', e.target.value);
+    });
 
-            // School & Objects
-            { ar: 'كتاب', en: 'Book', ku: 'کتێب', cat: 'School', icon: '📚' },
-            { ar: 'قلم', en: 'Pen', ku: 'پێنووس', cat: 'School', icon: '✏️' },
-            { ar: 'مدرسة', en: 'School', ku: 'قوتابخانە', cat: 'School', icon: '🏫' },
-            { ar: 'شمس', en: 'Sun', ku: 'خۆر', cat: 'Nature', icon: '☀️' },
-            { ar: 'قمر', en: 'Moon', ku: 'مانگ', cat: 'Nature', icon: '🌙' },
-            { ar: 'بيت', en: 'House', ku: 'ماڵ', cat: 'Objects', icon: '🏠' },
-            { ar: 'سيارة', en: 'Car', ku: 'ئۆتۆمبێل', cat: 'Objects', icon: '🚗' },
-            { ar: 'شجرة', en: 'Tree', ku: 'دار', cat: 'Nature', icon: '🌳' },
-            { ar: 'زهرة', en: 'Flower', ku: 'گوڵ', cat: 'Nature', icon: '🌸' },
-            { ar: 'ساعة', en: 'Clock/Watch', ku: 'کژژمێر', cat: 'Objects', icon: '⏰' }
-        ];
+    btnColorPicker.addEventListener('input', (e) => {
+      document.documentElement.style.setProperty('--btn-color', e.target.value);
+    });
 
-        // 3. Translations Dictionary for Multi-Language UI
-        const TRANSLATIONS = {
-            en: {
-                landingMsg: "Please you can start",
-                startBtn: "Start",
-                welcomeBadge: "Interactive Arabic Learning",
-                tabLetters: "Letters",
-                tabType: "Type Letters",
-                tabWords: "Words",
-                lettersSubTitle: "Arabic Letters",
-                lettersDesc: "Tap any letter to hear its pronunciation",
-                typeSubTitle: "Typing Practice",
-                typeDesc: "Type on screen or keyboard to hear speech feedback",
-                wordsSubTitle: "Word Vocabulary",
-                wordsDesc: "Explore words and tap cards to listen to audio",
-                settingsHeading: "Settings",
-                lblBgColor: "Background Color",
-                lblBtnColor: "Button Color",
-                lblLanguage: "UI Language",
-                footerText: "Created by",
-                appMainTitle: "Learn Arabic",
-                themeLabelDark: "Dark Mode",
-                themeLabelLight: "Light Mode",
-                searchPlaceholder: "Search word or meaning...",
-                catAll: "All"
-            },
-            ku: {
-                landingMsg: "تکایە دەتوانیت دەستپێبکەیت",
-                startBtn: "دەستپێکردن",
-                welcomeBadge: "فێربوونی سەرەنجڕاکێشی عەرەبی",
-                tabLetters: "پیتەکان",
-                tabType: "نووسینی پیتەکان",
-                tabWords: "وشەکان",
-                lettersSubTitle: "پیتەکانی عەرەبی",
-                lettersDesc: "کلیت لەسەر هەر پیتێک بکە بۆ بیستنی دەنگەکەی",
-                typeSubTitle: "ڕاهێنانی نووسین",
-                typeDesc: "لەسەر کیبۆرد بنووسە بۆ بیستنی گۆکردنی دەنگەکە",
-                wordsSubTitle: "فەرهەنگی وشەکان",
-                wordsDesc: "سەیری وشەکان بکە و کلیک بکە بۆ بیستنی دەنگ",
-                settingsHeading: "ڕێکخستنەکان",
-                lblBgColor: "ڕەنگی پاشبنەما",
-                lblBtnColor: "ڕەنگی دوگمە",
-                lblLanguage: "زمانی بەرنامە",
-                footerText: "دروستکراوە لەلایەن",
-                appMainTitle: "فێربوونی عەرەبی",
-                themeLabelDark: "دۆخی تاریک",
-                themeLabelLight: "دۆخی ڕووناک",
-                searchPlaceholder: "گەڕان بۆ وشە...",
-                catAll: "هەمووی"
-            },
-            ar: {
-                landingMsg: "فضلاً يمكنك البدء",
-                startBtn: "ابدأ",
-                welcomeBadge: "تعلم اللغة العربية التفاعلي",
-                tabLetters: "الحروف",
-                tabType: "كتابة الحروف",
-                tabWords: "الكلمات",
-                lettersSubTitle: "الحروف العربية",
-                lettersDesc: "انقر على أي حرف لسماع نطقة الصحيح",
-                typeSubTitle: "ممارسة الكتابة",
-                typeDesc: "اكتب على الشاشة أو اللوحة لسماع الصوت التفاعلي",
-                wordsSubTitle: "قاموس الكلمات",
-                wordsDesc: "استكشف الكلمات وانقر على البطاقات لسماع النطق",
-                settingsHeading: "الإعدادات",
-                lblBgColor: "لون الخلفية",
-                lblBtnColor: "لون الأزرار",
-                lblLanguage: "لغة الواجهة",
-                footerText: "تم التطوير بواسطة",
-                appMainTitle: "تعلم العربية",
-                themeLabelDark: "الوضع الليلي",
-                themeLabelLight: "الوضع النهار",
-                searchPlaceholder: "ابحث عن كلمة...",
-                catAll: "الكل"
-            }
-        };
+    langSelect.addEventListener('change', (e) => {
+      updateLanguage(e.target.value);
+    });
 
-        let currentLang = 'en';
-        let currentCategory = 'All';
+    startBtn.addEventListener('click', () => {
+      landingScreen.style.display = 'none';
+      dashboardScreen.classList.add('active');
+      window.scrollTo(0, 0);
+    });
 
-        /* ==================== SPEECH SYNTHESIS ENGINE ==================== */
-        function speakText(text) {
-            if (!text || text.trim() === '') return;
+    speakTypeBtn.addEventListener('click', () => {
+      const val = typingInput.value.trim();
+      if (val) playAudio(val);
+    });
 
-            // Cancel any ongoing speech
-            window.speechSynthesis.cancel();
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ar-SA'; // Arabic Speech Code
-            utterance.rate = 0.85; // Slightly slower for clear educational playback
-
-            // Try to set an Arabic voice if available in the browser
-            const voices = window.speechSynthesis.getVoices();
-            const arVoice = voices.find(voice => voice.lang.includes('ar'));
-            if (arVoice) {
-                utterance.voice = arVoice;
-            }
-
-            window.speechSynthesis.speak(utterance);
-        }
-
-        /* ==================== INITIALIZATION & RENDER ==================== */
-        window.onload = function() {
-            renderAlphabetGrid();
-            renderVirtualKeyboard();
-            renderCategoryFilters();
-            renderWordsGrid();
-            
-            // Pre-load synth voices
-            if (speechSynthesis.onvoiceschanged !== undefined) {
-                speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
-            }
-        };
-
-        // Render Alphabet Buttons
-        function renderAlphabetGrid() {
-            const container = document.getElementById('alphabetGrid');
-            container.innerHTML = '';
-
-            ARABIC_LETTERS.forEach(item => {
-                const card = document.createElement('button');
-                card.onclick = () => {
-                    speakText(item.char);
-                    card.classList.add('key-active');
-                    setTimeout(() => card.classList.remove('key-active'), 200);
-                };
-                card.className = "p-4 md:p-5 bg-white dark:bg-slate-800 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 border border-slate-100 dark:border-slate-700/60 flex flex-col items-center justify-center group cursor-pointer";
-                
-                card.innerHTML = `
-                    <span class="text-3xl md:text-4xl font-bold font-arabic custom-text-color mb-1 group-hover:scale-110 transition-transform">${item.char}</span>
-                    <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">${item.name}</span>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // Render Virtual Keyboard
-        function renderVirtualKeyboard() {
-            const keyboard = document.getElementById('virtualKeyboard');
-            keyboard.innerHTML = '';
-
-            ARABIC_LETTERS.forEach(item => {
-                const btn = document.createElement('button');
-                btn.onclick = () => {
-                    const area = document.getElementById('typingArea');
-                    area.value += item.char;
-                    speakText(item.char);
-                    btn.classList.add('key-active');
-                    setTimeout(() => btn.classList.remove('key-active'), 200);
-                };
-                btn.className = "p-2 sm:p-3 bg-white dark:bg-slate-800 rounded-xl font-arabic text-xl font-bold shadow hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 transition-all border border-slate-200/50 dark:border-slate-700";
-                btn.innerText = item.char;
-                keyboard.appendChild(btn);
-            });
-        }
-
-        // Render Word Categories
-        function renderCategoryFilters() {
-            const categories = ['All', ...new Set(ARABIC_WORDS.map(w => w.cat))];
-            const container = document.getElementById('categoryContainer');
-            container.innerHTML = '';
-
-            categories.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.onclick = () => {
-                    currentCategory = cat;
-                    updateCategoryButtons();
-                    renderWordsGrid();
-                };
-                btn.className = `cat-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                    currentCategory === cat 
-                    ? 'custom-btn shadow-md' 
-                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
-                }`;
-                btn.setAttribute('data-cat', cat);
-                btn.innerText = cat === 'All' ? TRANSLATIONS[currentLang].catAll : cat;
-                container.appendChild(btn);
-            });
-        }
-
-        function updateCategoryButtons() {
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                const cat = btn.getAttribute('data-cat');
-                if (cat === currentCategory) {
-                    btn.className = 'cat-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all custom-btn shadow-md';
-                } else {
-                    btn.className = 'cat-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700';
-                }
-            });
-        }
-
-        // Render Word Cards
-        function renderWordsGrid() {
-            const container = document.getElementById('wordsGrid');
-            const searchQuery = document.getElementById('wordSearch').value.toLowerCase();
-            container.innerHTML = '';
-
-            const filteredWords = ARABIC_WORDS.filter(item => {
-                const matchesCat = (currentCategory === 'All' || item.cat === currentCategory);
-                const matchesSearch = item.ar.includes(searchQuery) || 
-                                     item.en.toLowerCase().includes(searchQuery) || 
-                                     item.ku.includes(searchQuery);
-                return matchesCat && matchesSearch;
-            });
-
-            if(filteredWords.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full py-12 text-center text-slate-400">
-                        <i class="fas fa-search-minus text-4xl mb-3"></i>
-                        <p>No words found</p>
-                    </div>
-                `;
-                return;
-            }
-
-            filteredWords.forEach(item => {
-                const card = document.createElement('button');
-                card.onclick = () => {
-                    speakText(item.ar);
-                    card.classList.add('key-active');
-                    setTimeout(() => card.classList.remove('key-active'), 200);
-                };
-                card.className = "p-4 bg-white dark:bg-slate-800 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 border border-slate-100 dark:border-slate-700/60 flex flex-col items-center justify-between text-center group cursor-pointer";
-                
-                const translationText = currentLang === 'ku' ? item.ku : item.en;
-
-                card.innerHTML = `
-                    <div class="text-4xl mb-2 group-hover:scale-110 transition-transform">${item.icon}</div>
-                    <div class="text-2xl font-bold font-arabic custom-text-color mb-1">${item.ar}</div>
-                    <div class="text-xs font-medium text-slate-500 dark:text-slate-400">${translationText}</div>
-                    <div class="mt-3 text-slate-300 dark:text-slate-600 group-hover:text-blue-500 transition-colors">
-                        <i class="fas fa-volume-high text-sm"></i>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function filterWords() {
-            renderWordsGrid();
-        }
-
-        function clearTypingArea() {
-            document.getElementById('typingArea').value = '';
-        }
-
-        function addSpace() {
-            document.getElementById('typingArea').value += ' ';
-        }
-
-        function backspace() {
-            const area = document.getElementById('typingArea');
-            area.value = area.value.slice(0, -1);
-        }
-
-        function showAppContent() {
-            document.getElementById('landingView').classList.add('hidden');
-            document.getElementById('appView').classList.remove('hidden');
-            document.getElementById('appView').classList.add('flex');
-            document.getElementById('headerTitle').classList.remove('hidden');
-        }
-
-        function switchTab(tabName) {
-            // Tab Buttons styling reset
-            const tabs = ['Letters', 'Type', 'Words'];
-            tabs.forEach(t => {
-                const btn = document.getElementById(`tab${t}`);
-                const sec = document.getElementById(`section${t}`);
-                
-                if (t.toLowerCase() === tabName) {
-                    btn.className = "tab-btn flex-1 min-w-[100px] py-3 px-4 rounded-xl font-bold text-sm md:text-base transition-all duration-200 flex items-center justify-center gap-2 custom-btn shadow-md";
-                    sec.classList.remove('hidden');
-                } else {
-                    btn.className = "tab-btn flex-1 min-w-[100px] py-3 px-4 rounded-xl font-bold text-sm md:text-base text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-200 flex items-center justify-center gap-2";
-                    sec.classList.add('hidden');
-                }
-            });
-        }
-
-        /* ==================== SETTINGS & THEME FUNCTIONS ==================== */
-        function toggleSettingsMenu() {
-            const panel = document.getElementById('settingsPanel');
-            panel.classList.toggle('hidden');
-        }
-
-        function toggleDarkMode() {
-            const html = document.documentElement;
-            const themeIcon = document.getElementById('themeIcon');
-            const themeLabel = document.getElementById('themeLabel');
-
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                themeIcon.className = "fas fa-moon text-xl";
-                themeLabel.innerText = TRANSLATIONS[currentLang].themeLabelDark;
-            } else {
-                html.classList.add('dark');
-                themeIcon.className = "fas fa-sun text-xl text-amber-400";
-                themeLabel.innerText = TRANSLATIONS[currentLang].themeLabelLight;
-            }
-        }
-
-        function changeBgColor(color) {
-            document.documentElement.style.setProperty('--bg-custom', color);
-            document.getElementById('bgColorHex').innerText = color;
-        }
-
-        function resetBgColor() {
-            const defaultBg = "#f8fafc";
-            document.getElementById('bgColorInput').value = defaultBg;
-            changeBgColor(defaultBg);
-        }
-
-        function changeBtnColor(color) {
-            document.documentElement.style.setProperty('--btn-custom', color);
-            document.getElementById('btnColorHex').innerText = color;
-            
-            // Calculate legibility contrast for text inside custom buttons
-            const r = parseInt(color.substring(1,3), 16);
-            const g = parseInt(color.substring(3,5), 16);
-            const b = parseInt(color.substring(5,7), 16);
-            const yiq = ((r*299)+(g*587)+(b*114))/1000;
-            const textColor = (yiq >= 128) ? '#1e293b' : '#ffffff';
-            
-            document.documentElement.style.setProperty('--btn-text-custom', textColor);
-        }
-
-        function resetBtnColor() {
-            const defaultBtn = "#3b82f6";
-            document.getElementById('btnColorInput').value = defaultBtn;
-            changeBtnColor(defaultBtn);
-        }
-
-        function changeLanguage(langKey) {
-            currentLang = langKey;
-            const t = TRANSLATIONS[langKey];
-
-            // Update UI elements with new language strings
-            document.getElementById('landingMsg').innerText = t.landingMsg;
-            document.getElementById('startBtnText').innerText = t.startBtn;
-            document.getElementById('welcomeBadge').innerText = t.welcomeBadge;
-            document.getElementById('tabLettersText').innerText = t.tabLetters;
-            document.getElementById('tabTypeText').innerText = t.tabType;
-            document.getElementById('tabWordsText').innerText = t.tabWords;
-            document.getElementById('lettersSubTitle').innerText = t.lettersSubTitle;
-            document.getElementById('lettersDesc').innerText = t.lettersDesc;
-            document.getElementById('typeSubTitle').innerText = t.typeSubTitle;
-            document.getElementById('typeDesc').innerText = t.typeDesc;
-            document.getElementById('wordsSubTitle').innerText = t.wordsSubTitle;
-            document.getElementById('wordsDesc').innerText = t.wordsDesc;
-            document.getElementById('settingsHeading').innerHTML = `<i class="fas fa-sliders-h custom-text-color"></i> ${t.settingsHeading}`;
-            document.getElementById('lblBgColor').innerText = t.lblBgColor;
-            document.getElementById('lblBtnColor').innerText = t.lblBtnColor;
-            document.getElementById('lblLanguage').innerText = t.lblLanguage;
-            document.getElementById('footerText').innerText = t.footerText;
-            document.getElementById('appMainTitle').innerText = t.appMainTitle;
-            document.getElementById('wordSearch').placeholder = t.searchPlaceholder;
-
-            // Re-render categories & word grid to update language translations
-            renderCategoryFilters();
-            renderWordsGrid();
-        }
-    </script>
+    renderLetters();
+    renderWords();
+  </script>
 </body>
 </html>

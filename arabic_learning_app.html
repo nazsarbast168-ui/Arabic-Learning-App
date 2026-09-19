@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Arabic Learning App - Naz Sarbast</title>
 
+  <!-- Free Speech API Script -->
+  <script src="https://code.responsivevoice.org/responsivevoice.js?key=FREE_KEY_OR_PUBLIC"></script>
+
   <style>
-    /* CSS Variables for theme management */
     :root {
       --bg-color: #f4f7f6;
       --card-bg: #ffffff;
@@ -18,7 +20,6 @@
       --app-font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Traditional Arabic', 'Cairo', sans-serif;
     }
 
-    /* Dark Mode Theme Variables */
     body.dark-mode {
       --bg-color: #1a1a2e;
       --card-bg: #16213e;
@@ -45,14 +46,12 @@
       position: relative;
     }
 
-    /* SVG Icon Styling */
     .icon {
       width: 20px;
       height: 20px;
       fill: currentColor;
     }
 
-    /* Dynamic Button Styling */
     .custom-btn {
       background-color: var(--btn-color);
       color: var(--btn-text);
@@ -79,7 +78,6 @@
       transform: translateY(0);
     }
 
-    /* Navbar Header */
     header {
       display: flex;
       justify-content: space-between;
@@ -89,7 +87,6 @@
       z-index: 100;
     }
 
-    /* Top Left: Dark/Light Mode Toggle */
     .theme-btn, .settings-btn {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -104,7 +101,6 @@
       box-shadow: var(--shadow);
     }
 
-    /* Top Right: Settings Button & Dropdown */
     .settings-container {
       position: relative;
     }
@@ -151,7 +147,6 @@
       cursor: pointer;
     }
 
-    /* Landing Screen */
     .landing-screen {
       display: flex;
       flex-direction: column;
@@ -167,7 +162,6 @@
       margin-bottom: 25px;
     }
 
-    /* Main Dashboard Screen */
     .dashboard-screen {
       display: none;
       flex-direction: column;
@@ -192,7 +186,6 @@
       padding-bottom: 8px;
     }
 
-    /* Grid Layouts */
     .grid-container {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
@@ -235,7 +228,6 @@
       opacity: 0.8;
     }
 
-    /* Typing Section */
     .typing-section {
       background: var(--card-bg);
       padding: 20px;
@@ -262,7 +254,6 @@
       direction: rtl;
     }
 
-    /* Footer */
     footer {
       text-align: center;
       padding: 20px;
@@ -275,21 +266,16 @@
 </head>
 <body>
 
-  <!-- Header Navigation -->
   <header>
-    <!-- Top Left: Theme Toggle -->
     <button class="theme-btn" id="themeBtn" title="Toggle Theme">
       <svg class="icon" viewBox="0 0 24 24" id="themeIcon">
-        <!-- Moon Icon -->
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
       </svg>
     </button>
 
-    <!-- Top Right: Settings -->
     <div class="settings-container">
       <button class="settings-btn" id="settingsBtn" title="Settings">
         <svg class="icon" viewBox="0 0 24 24">
-          <!-- Gear Icon -->
           <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"></path>
         </svg>
       </button>
@@ -315,7 +301,6 @@
     </div>
   </header>
 
-  <!-- Landing Screen -->
   <main class="landing-screen" id="landingScreen">
     <h1 id="welcomeText">please you can start</h1>
     <button class="custom-btn" id="startBtn">
@@ -326,7 +311,6 @@
     </button>
   </main>
 
-  <!-- Main Application Content Screen -->
   <div class="dashboard-screen" id="dashboardScreen">
     <section>
       <h2 class="section-title">
@@ -358,7 +342,6 @@
     </section>
   </div>
 
-  <!-- Footer -->
   <footer>
     <span id="footerText">Naz Sarbast</span>
   </footer>
@@ -464,15 +447,24 @@
     const typingInput = document.getElementById('typingInput');
     const speakTypeBtn = document.getElementById('speakTypeBtn');
 
+    // --- Audio API Function (Uses ResponsiveVoice or Google Translate API Fallback) ---
     function playAudio(text) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ar-SA';
-        utterance.rate = 0.8;
-        window.speechSynthesis.speak(utterance);
+      if (typeof responsiveVoice !== 'undefined') {
+        responsiveVoice.speak(text, "Arabic Male", { pitch: 1, rate: 0.85 });
       } else {
-        alert("Text-to-speech is not supported in your browser.");
+        // Fallback to Google Translate Free Audio API endpoint
+        const encodedText = encodeURIComponent(text);
+        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=ar&client=tw-ob`;
+        const audio = new Audio(audioUrl);
+        audio.play().catch(() => {
+          // Native browser fallback
+          if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ar-SA';
+            window.speechSynthesis.speak(utterance);
+          }
+        });
       }
     }
 
@@ -526,10 +518,8 @@
     themeBtn.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
       if (document.body.classList.contains('dark-mode')) {
-        // Sun Icon
         themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2"></path>';
       } else {
-        // Moon Icon
         themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
       }
     });

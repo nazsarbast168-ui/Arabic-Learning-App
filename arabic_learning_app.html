@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Arabic Learning App - Naz Sarbast</title>
 
-  <!-- Free Speech API Script -->
-  <script src="https://code.responsivevoice.org/responsivevoice.js?key=FREE_KEY_OR_PUBLIC"></script>
-
   <style>
     :root {
       --bg-color: #f4f7f6;
@@ -447,25 +444,32 @@
     const typingInput = document.getElementById('typingInput');
     const speakTypeBtn = document.getElementById('speakTypeBtn');
 
-    // --- Audio API Function (Uses ResponsiveVoice or Google Translate API Fallback) ---
+    // --- GitHub Pages Compatible Web Speech API ---
     function playAudio(text) {
-      if (typeof responsiveVoice !== 'undefined') {
-        responsiveVoice.speak(text, "Arabic Male", { pitch: 1, rate: 0.85 });
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // Stop any ongoing speech
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ar-SA';
+        utterance.rate = 0.8;
+        
+        // Load available voices & pick an Arabic voice if installed
+        const voices = window.speechSynthesis.getVoices();
+        const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
+        if (arabicVoice) {
+          utterance.voice = arabicVoice;
+        }
+
+        window.speechSynthesis.speak(utterance);
       } else {
-        // Fallback to Google Translate Free Audio API endpoint
-        const encodedText = encodeURIComponent(text);
-        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=ar&client=tw-ob`;
-        const audio = new Audio(audioUrl);
-        audio.play().catch(() => {
-          // Native browser fallback
-          if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ar-SA';
-            window.speechSynthesis.speak(utterance);
-          }
-        });
+        alert("Speech Synthesis is not supported in your browser.");
       }
+    }
+
+    // Ensure speech voices are preloaded
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
     }
 
     function renderLetters() {
